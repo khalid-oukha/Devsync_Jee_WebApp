@@ -1,4 +1,4 @@
-package org.example.entities.enums;
+package org.example.entities;
 
 import jakarta.persistence.*;
 
@@ -26,9 +26,20 @@ public class User {
     private String email;
 
     @Column(name = "is_manager", nullable = false)
-    private Boolean isManager = false; // default to false
+    private Boolean isManager;
 
-    // Getters and Setters
+    public User(String username, String password, String firstName, String lastName, String email, Boolean isManager) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.isManager = isManager;
+    }
+
+    public User() {
+    }
+
     public Long getId() {
         return id;
     }
