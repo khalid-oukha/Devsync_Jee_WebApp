@@ -37,6 +37,16 @@ public class User {
         this.isManager = isManager;
     }
 
+    public User(Long id, String username, String password, String firstName, String lastName, String email, Boolean isManager) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.isManager = isManager;
+    }
+
     public User() {
     }
 
