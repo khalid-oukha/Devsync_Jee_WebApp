@@ -113,7 +113,6 @@
                         </td>
                         <td class="px-4 py-3">
                             <div class="flex items-center space-x-4 text-sm">
-                                <!-- Edit button -->
                                 <a href="users?editUserId=${user.id}">
                                     <button class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                             aria-label="Edit">
@@ -123,7 +122,6 @@
                                     </button>
                                 </a>
 
-                                <!-- Delete button -->
                                 <form action="users" method="post">
                                     <input type="hidden" name="action" value="delete"/>
                                     <input type="hidden" name="userId" value="${user.id}"/>
@@ -149,7 +147,6 @@
     </div>
 </main>
 
-<%@include file="WEB-INF/views/includes/footer.jsp" %>
 
 <script src="./assets/js/navigation.js"></script>
 <script src="./assets/js/navbar.js"></script>
