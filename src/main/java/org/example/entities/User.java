@@ -2,6 +2,8 @@ package org.example.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -28,6 +30,20 @@ public class User {
     @Column(name = "is_manager", nullable = false)
     private Boolean isManager;
 
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Task> tasks;
+
+    @Column(name = "delete_token", nullable = false)
+    private int deleteToken;
+
+    @Column(name = "update_token", nullable = false)
+    private int updateToken;
+
+    public User() {
+        this.updateToken = 2;
+        this.deleteToken = 1;
+    }
+
     public User(String username, String password, String firstName, String lastName, String email, Boolean isManager) {
         this.username = username;
         this.password = password;
@@ -35,6 +51,7 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.isManager = isManager;
+        this.deleteToken = 1;
     }
 
     public User(Long id, String username, String password, String firstName, String lastName, String email, Boolean isManager) {
@@ -45,9 +62,7 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.isManager = isManager;
-    }
-
-    public User() {
+        this.deleteToken = 1;
     }
 
     public Long getId() {
@@ -104,5 +119,21 @@ public class User {
 
     public void setIsManager(Boolean isManager) {
         this.isManager = isManager;
+    }
+
+    public int getDeleteToken() {
+        return deleteToken;
+    }
+
+    public void setDeleteToken(int deleteToken) {
+        this.deleteToken = deleteToken;
+    }
+
+    public int getUpdateToken() {
+        return updateToken;
+    }
+
+    public void setUpdateToken(int updateToken) {
+        this.updateToken = updateToken;
     }
 }
