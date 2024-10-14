@@ -51,11 +51,20 @@ public class TaskService {
         return errors;
     }
 
-    public List<String> updateTask(Task task) {
+    public List<String> updateTask(Task task, User loggedInUser) {
         List<String> errors = taskValidator.validateTask(task);
+        if (task == null) {
+            errors.add("Task not found.");
+            return errors;
+        }
 
         if (task.isLocked()) {
             errors.add("this task is locked can't be deleted or updated");
+            return errors;
+        }
+
+        if (loggedInUser.getIsManager()) {
+            taskRepository.updateTask(task);
             return errors;
         }
 
@@ -142,6 +151,10 @@ public class TaskService {
         return taskRepository.findAll().stream().filter(task -> task.getStartDate().isAfter(from_date) && task.getEndDate().isBefore(to_date)).collect(Collectors.toList());
     }
 
+    public List<Task> filterByModificationRequest() {
+        return taskRepository.findAll().stream().filter(Task::isModificationRequested).collect(Collectors.toList());
+    }
+
     public Set<Tag> parseTags(String tagsInput) {
         return Arrays.stream(tagsInput.split(","))
                 .map(String::trim)
@@ -149,5 +162,32 @@ public class TaskService {
                 .map(Tag::new)
                 .collect(Collectors.toSet());
     }
+
+    public List<String> requestModification(Long taskId, User loggedInUser) {
+        List<String> errors = new ArrayList<>();
+
+        Task task = taskRepository.findById(taskId).orElse(null);
+        if (task == null) {
+            errors.add("Task not found.");
+            return errors;
+        }
+
+        if (task.isLocked() || task.isModificationRequested()) {
+            errors.add("Modification request already exists or task is locked.");
+            return errors;
+        }
+
+        if (loggedInUser.getIsManager()) {
+            task.setModificationRequested(true);
+            taskRepository.updateTask(task);
+
+            User assignedTo = task.getAssignedTo();
+            assignedTo.setUpdateToken(0);
+            userService.update(assignedTo);
+        }
+
+        return errors;
+    }
+
 
 }
