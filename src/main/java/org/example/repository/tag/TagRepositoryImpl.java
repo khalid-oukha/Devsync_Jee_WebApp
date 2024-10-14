@@ -1,57 +1,56 @@
-package org.example.repository.user;
+package org.example.repository.tag;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import org.example.entities.User;
+import org.example.entities.Tag;
 
 import java.util.List;
 import java.util.Optional;
 
-public class UserRepositoryImpl implements UserRepository {
+public class TagRepositoryImpl implements TagRepository {
+
     private final EntityManager em;
 
-    public UserRepositoryImpl() {
+    public TagRepositoryImpl() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJPAUnit");
         em = emf.createEntityManager();
     }
 
-    @Override
-    public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+    public List<Tag> findAll() {
+        return em.createQuery("SELECT t FROM Tag t", Tag.class).getResultList();
     }
 
-    @Override
-    public void create(User user) {
+    public void create(Tag tag) {
         try {
             em.getTransaction().begin();
-            em.persist(user);
+            em.persist(tag);
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
             throw e;
         }
+
     }
 
-    @Override
-    public void update(User user) {
+    public void update(Tag tag) {
         try {
             em.getTransaction().begin();
-            em.merge(user);
+            em.merge(tag);
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
             throw e;
         }
+
     }
 
-    @Override
-    public void delete(Long userId) {
+    public void delete(Long tagId) {
         try {
             em.getTransaction().begin();
-            User user = em.find(User.class, userId);
-            if (user != null) {
-                em.remove(user);
+            Tag tag = em.find(Tag.class, tagId);
+            if (tag != null) {
+                em.remove(tag);
             }
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -60,15 +59,15 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    @Override
-    public Optional<User> findById(Long userId) {
-        User user = em.find(User.class, userId);
-        return Optional.ofNullable(user);
+    public Optional<Tag> findById(Long tagId) {
+        Tag tag = em.find(Tag.class, tagId);
+        return Optional.ofNullable(tag);
     }
 
-    public User getUser(Long id) {
-        return em.createQuery("SELECT u FROM User u where u.id = :id", User.class)
-                .setParameter("id", id)
+    public Optional<Tag> findByName(String tagName) {
+        Tag tag = em.createQuery("SELECT t FROM Tag t WHERE t.name = :name", Tag.class)
+                .setParameter("name", tagName)
                 .getSingleResult();
+        return Optional.ofNullable(tag);
     }
 }

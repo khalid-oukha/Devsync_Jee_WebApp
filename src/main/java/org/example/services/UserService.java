@@ -15,10 +15,6 @@ public class UserService {
         this.userRepository = new UserRepositoryImpl();
     }
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     public List<User> findAll() {
         return userRepository.findAll();
     }

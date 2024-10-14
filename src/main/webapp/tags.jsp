@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
+    <title>tag Management</title>
     <link rel="stylesheet" href="./assets/css/tailwind.output.css"/>
 </head>
 <body class="bg-gray-300 dark:bg-gray-900">
@@ -17,11 +17,12 @@
 
 
     <h2 class="my-6 text-4xl font-semibold text-center font-poppins tracking-widest text-gray-700 dark:text-gray-200">
-        <span class="text-primary-100 dark:text-orange">Registered</span> Users
+        <span class="text-primary-100 dark:text-orange">Registered</span> tags
     </h2>
 
 
-    <form action="users" method="post" class="my-6">
+    <form action="tags" method="post" class="my-6">
+        <input type="hidden" name="action" value="create"/>
 
         <button type="submit"
                 class="px-4 py-2 my-2 bg-orange rounded text-white hover:bg-primary-100 focus:outline-none transition-colors">
@@ -32,39 +33,15 @@
             <table class="w-full whitespace-no-wrap">
                 <thead>
                 <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                    <th class="px-4 py-3">First name</th>
-                    <th class="px-4 py-3">Last name</th>
-                    <th class="px-4 py-3">username</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Password</th>
-                    <th class="px-4 py-3">Is manager</th>
+                    <th class="px-4 py-3">name</th>
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
                 <tr>
                     <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <input type="text" placeholder="First Name" name="firstName" class="border p-2 rounded w-full">
+                        <input type="text" placeholder="name" name="name" class="border p-2 rounded w-full">
                     </td>
-                    <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <input type="text" placeholder="Last Name" name="lastName" class="border p-2 rounded w-full">
-                    </td>
-                    <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <input type="text" placeholder="Username" name="username" class="border p-2 rounded w-full">
-                    </td>
-                    <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <input type="email" placeholder="Email" name="email" class="border p-2 rounded w-full">
-                    </td>
-                    <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <input type="password" placeholder="Password" name="password" class="border p-2 rounded w-full">
-                    </td>
-                    <td class="border border-gray-300 px-3 py-2 dark:border-gray-700 bg-gray-50">
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" name="isManager" value="true"
-                                   class="form-checkbox h-5 w-5 text-orange-600">
 
-                            <span class="text-gray-700 dark:text-gray-400">Yes</span>
-                        </label>
-                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -77,45 +54,24 @@
             <table class="w-full whitespace-no-wrap">
                 <thead>
                 <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                    <th class="px-4 py-3">full name</th>
-                    <th class="px-4 py-3">username</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Is manager</th>
-                    <th class="px-4 py-3">Actions</th>
+                    <th class="px-4 py-3">tag id</th>
+                    <th class="px-4 py-3">name</th>
+                    <th class="px-4 py-3">action</th>
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                <c:forEach var="user" items="${users}">
+                <c:forEach var="tag" items="${tags}">
                     <tr class="text-gray-700 dark:text-gray-400">
-                        <td class="px-4 py-3">
-                            <div class="flex items-center text-sm">
-                                <div class="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                                    <div class="absolute inset-0 rounded-full shadow-inner" aria-hidden="true"></div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">
-                                            ${user.firstName}
-                                    </p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">
-                                            ${user.lastName}
-                                    </p>
-                                </div>
-                            </div>
+                        <td class="px-4 py-3 text-sm">
+                                ${tag.id}
                         </td>
                         <td class="px-4 py-3 text-sm">
-                                ${user.username}
+                                ${tag.name}
                         </td>
-                        <td class="px-4 py-3 text-sm">
-                                ${user.email}
-                        </td>
-                        <td class="px-4 py-3 text-xs">
-                <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                        ${user.isManager}
-                </span>
-                        </td>
+
                         <td class="px-4 py-3">
                             <div class="flex items-center space-x-4 text-sm">
-                                <a href="users?editUserId=${user.id}">
+                                <a href="tags?edittagId=${tag.id}">
                                     <button class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                             aria-label="Edit">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
@@ -124,20 +80,20 @@
                                     </button>
                                 </a>
 
-                                <form action="users" method="post">
+                                <form action="tags" method="post">
                                     <input type="hidden" name="action" value="delete"/>
-                                    <input type="hidden" name="userId" value="${user.id}"/>
+                                    <input type="hidden" name="tagId" value="${tag.id}"/>
                                     <button class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-red-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                             aria-label="Delete">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                   d="M8.707 9.707a1 1 0 01-1.414 0L5 7.414 3.707 8.707a1 1 0 01-1.414-1.414l1.5-1.5a1 1 0 011.414 0L8 7.414l5-5A1 1 0 1113.707 4.293l-5 5z"
                                                   clip-rule="evenodd">
+
                                             </path>
                                         </svg>
                                     </button>
                                 </form>
-
                             </div>
                         </td>
 
