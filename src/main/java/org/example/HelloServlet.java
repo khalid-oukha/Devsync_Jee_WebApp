@@ -1,11 +1,15 @@
 package org.example;
 
-import java.io.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.io.PrintWriter;
 
 @WebServlet(name = "helloServlet", value = "/hello-servlet")
 public class HelloServlet extends HttpServlet {
@@ -22,7 +26,6 @@ public class HelloServlet extends HttpServlet {
             em.close();
             message = "Connected to the database successfully!";
         } catch (Exception e) {
-            // Log the full exception stack trace
             e.printStackTrace();
             message = "Error connecting to the database: " + e.getMessage();
         }

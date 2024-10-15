@@ -106,7 +106,6 @@
                                             <rect x="11" y="17" width="2" height="2" rx="1"/>
                                         </svg>
                                     </button>
-
                                 </form>
 
                             </div>
