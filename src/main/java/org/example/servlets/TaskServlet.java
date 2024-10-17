@@ -1,5 +1,6 @@
 package org.example.servlets;
 
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,14 +22,11 @@ import java.util.Set;
 @WebServlet("/tasks/*")
 public class TaskServlet extends HttpServlet {
 
+    @Inject
     private TaskService taskService;
+    @Inject
     private UserService userService;
-
-    @Override
-    public void init() {
-        taskService = new TaskService();
-        userService = new UserService();
-    }
+    
 
     private void loadTaskBoard(HttpServletRequest request) {
         List<Task> todoTasks = taskService.findAllTodoTasks();
@@ -109,7 +107,7 @@ public class TaskServlet extends HttpServlet {
                     task.setEndDate(LocalDate.parse(request.getParameter("end_date")));
                     List<User> users = userService.findAll();
                     request.setAttribute("users", users);
-                    
+
                     Set<Tag> tags = taskService.parseTags(request.getParameter("tags"));
                     task.setTags(tags);
                     String taskStatusParam = request.getParameter("taskStatus");

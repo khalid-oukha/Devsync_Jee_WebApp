@@ -1,5 +1,6 @@
 package org.example.scheduler;
 
+import jakarta.inject.Inject;
 import org.example.entities.User;
 import org.example.services.UserService;
 
@@ -10,11 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 public class TokensScheduler {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final UserService userService;
 
-    public TokensScheduler() {
-        this.userService = new UserService();
-    }
+    @Inject
+    private UserService userService;
+
 
     public void startTokenScheduler() {
         scheduler.scheduleAtFixedRate(this::resetTokens, getInitialDelay(), 30 * 24 * 60 * 60, TimeUnit.SECONDS); // 30 days

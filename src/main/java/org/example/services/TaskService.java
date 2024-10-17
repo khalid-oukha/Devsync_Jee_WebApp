@@ -1,5 +1,7 @@
 package org.example.services;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.example.Helpers.DateHelper;
 import org.example.Helpers.TaskValidator;
 import org.example.entities.Tag;
@@ -7,22 +9,20 @@ import org.example.entities.Task;
 import org.example.entities.User;
 import org.example.entities.enums.Task_Status;
 import org.example.repository.task.TaskRepository;
-import org.example.repository.task.TaskRepositoryImpl;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@ApplicationScoped
 public class TaskService {
-    private final TaskRepository taskRepository;
-    private final TaskValidator taskValidator;
-    private final UserService userService;
+    @Inject
+    private TaskRepository taskRepository;
 
-    public TaskService() {
-        this.taskRepository = new TaskRepositoryImpl();
-        this.taskValidator = new TaskValidator();
-        this.userService = new UserService();
-    }
+    private final TaskValidator taskValidator = new TaskValidator();
+
+    @Inject
+    private UserService userService;
 
     public List<String> createTask(Task task, String assignedToId) {
         List<String> errors = taskValidator.validateTask(task);

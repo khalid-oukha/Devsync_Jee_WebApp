@@ -1,9 +1,11 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 @Entity
 @Table(name = "users")
 public class User {
@@ -64,6 +66,20 @@ public class User {
         this.isManager = isManager;
         this.deleteToken = 1;
     }
+
+    public User(Long id, String username, String password, String firstName, String lastName, String email, Boolean isManager, List<Task> tasks, int deleteToken, int updateToken) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.isManager = isManager;
+        this.tasks = tasks;
+        this.deleteToken = deleteToken;
+        this.updateToken = updateToken;
+    }
+
 
     public Long getId() {
         return id;

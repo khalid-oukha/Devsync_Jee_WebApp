@@ -1,74 +1,110 @@
 package org.example.repository.user;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityTransaction;
 import org.example.entities.User;
 
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class UserRepositoryImpl implements UserRepository {
+
     private final EntityManager em;
 
     public UserRepositoryImpl() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("myJPAUnit");
-        em = emf.createEntityManager();
+        em = Persistence.createEntityManagerFactory("myJPAUnit").createEntityManager();
     }
 
     @Override
     public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        List<User> users = null;
+        try {
+            users = em.createQuery("SELECT u FROM User u", User.class).getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
+        return users;
     }
 
     @Override
     public void create(User user) {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
         try {
-            em.getTransaction().begin();
             em.persist(user);
-            em.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
+            transaction.rollback();
+            e.printStackTrace();
         }
     }
 
     @Override
     public void update(User user) {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
         try {
-            em.getTransaction().begin();
             em.merge(user);
-            em.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
+            transaction.rollback();
+            e.printStackTrace();
         }
     }
 
     @Override
     public void delete(Long userId) {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
         try {
-            em.getTransaction().begin();
             User user = em.find(User.class, userId);
             if (user != null) {
                 em.remove(user);
             }
-            em.getTransaction().commit();
+            transaction.commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
+            transaction.rollback();
+            e.printStackTrace();
         }
     }
 
     @Override
     public Optional<User> findById(Long userId) {
-        User user = em.find(User.class, userId);
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        User user = null;
+        try {
+            user = em.find(User.class, userId);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
         return Optional.ofNullable(user);
     }
 
+    @Override
     public User getUser(Long id) {
-        return em.createQuery("SELECT u FROM User u where u.id = :id", User.class)
-                .setParameter("id", id)
-                .getSingleResult();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        User user = null;
+        try {
+            user = em.createQuery("SELECT u FROM User u WHERE u.id = :id", User.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        }
+        return user;
     }
 }

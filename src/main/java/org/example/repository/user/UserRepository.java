@@ -15,4 +15,6 @@ public interface UserRepository {
     void delete(Long userId);
 
     Optional<User> findById(Long userId); // New method
+
+    User getUser(Long id);
 }

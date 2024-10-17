@@ -1,5 +1,6 @@
 package org.example.repository.tag;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -8,6 +9,7 @@ import org.example.entities.Tag;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class TagRepositoryImpl implements TagRepository {
 
     private final EntityManager em;

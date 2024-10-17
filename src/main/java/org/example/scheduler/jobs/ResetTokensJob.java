@@ -1,5 +1,6 @@
 package org.example.scheduler.jobs;
 
+import jakarta.inject.Inject;
 import org.example.entities.User;
 import org.example.services.UserService;
 import org.quartz.Job;
@@ -8,7 +9,8 @@ import org.quartz.JobExecutionContext;
 import java.util.List;
 
 public class ResetTokensJob implements Job {
-    private final UserService userService = new UserService();
+    @Inject
+    private UserService userService;
 
     @Override
     public void execute(JobExecutionContext context) {

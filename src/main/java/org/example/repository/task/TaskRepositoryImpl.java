@@ -1,21 +1,18 @@
 package org.example.repository.task;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceContext;
 import org.example.entities.Task;
 
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class TaskRepositoryImpl implements TaskRepository {
-    private final EntityManager entityManager;
 
-    public TaskRepositoryImpl() {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("myJPAUnit");
-        entityManager = entityManagerFactory.createEntityManager();
-    }
-
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public void createTask(Task task) {
@@ -61,7 +58,7 @@ public class TaskRepositoryImpl implements TaskRepository {
         Task task = entityManager.find(Task.class, taskId);
         return Optional.ofNullable(task);
     }
-    
+
     @Override
     public List<Task> findAll() {
         return entityManager.createQuery("SELECT t FROM Task t", Task.class).getResultList();
