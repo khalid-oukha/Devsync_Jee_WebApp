@@ -2,6 +2,7 @@ package org.example.repository.task;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Persistence;
 import jakarta.persistence.PersistenceContext;
 import org.example.entities.Task;
 
@@ -11,9 +12,11 @@ import java.util.Optional;
 @ApplicationScoped
 public class TaskRepositoryImpl implements TaskRepository {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
+    public TaskRepositoryImpl() {
+        entityManager = Persistence.createEntityManagerFactory("myJPAUnit").createEntityManager();
+    }
     @Override
     public void createTask(Task task) {
         try {

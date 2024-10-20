@@ -59,8 +59,6 @@ public class TaskService {
             return errors;
         }
 
-//        errors.addAll(taskValidator.validateTask(task));
-
         if (task.isLocked()) {
             errors.add("This task is locked; it can't be deleted or updated.");
             return errors;

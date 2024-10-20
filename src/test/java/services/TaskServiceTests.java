@@ -16,10 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,10 +117,19 @@ public class TaskServiceTests {
 
     @Test
     void createTask_should_create_task_if_no_errors() {
-        // Arrange
+        User expectedAssignTo = User.builder()
+                .id(1L)
+                .username("khalidVii")
+                .firstName("Dadad")
+                .lastName("Hasan")
+                .email("oukhakhalid@gmail.com")
+                .password("oukha")
+                .build();
+
         Task task = Task.builder()
+                .id(1000L)
                 .title("Task 1")
-                .assignedTo(User.builder().id(2L).build())
+                .assignedTo(expectedAssignTo)
                 .status(Task_Status.TODO)
                 .isLocked(false)
                 .startDate(LocalDate.now().plusDays(4))
@@ -133,15 +139,25 @@ public class TaskServiceTests {
                 .tags(new HashSet<>(List.of(Tag.builder().id(1L).name("Tag 1").build())))
                 .build();
 
-        when(taskValidator.validateTask(task)).thenReturn(List.of());
-
         when(userService.findById(2L)).thenReturn(Optional.of(User.builder().id(2L).build()));
+
+        when(taskRepository.findById(1000L)).thenReturn(Optional.of(task));
 
         List<String> errors = taskService.createTask(task, "2");
 
+
+        Task createdTask = taskService.findById(1000L);
+
+        assertNotNull(createdTask, "Created task should not be null");
+        assertEquals(task.getAssignedTo().getId(), createdTask.getAssignedTo().getId(), "Assigned user should match");
+        assertEquals(task.getCreatedAt(), createdTask.getCreatedAt(), "Created at date should match");
+        assertEquals(task.getCreatedBy(), createdTask.getCreatedBy(), "Created by user should match");
+        assertEquals(task.getEndDate(), createdTask.getEndDate(), "End date should match");
+        assertEquals(task.getStartDate(), createdTask.getStartDate(), "Start date should match");
         assertTrue(errors.isEmpty(), "Should not have any errors");
         verify(taskRepository, times(1)).createTask(task);
     }
+
 
 
     @Test
@@ -188,7 +204,6 @@ public class TaskServiceTests {
 
     @Test
     void updateTask_should_update_task_when_no_errors() {
-        // Arrange
         Task oldTask = Task.builder()
                 .id(1L)
                 .title("Old Task Title")
@@ -207,15 +222,15 @@ public class TaskServiceTests {
                 .isLocked(false)
                 .build();
 
-           List<String> errors = taskService.updateTask(updatedTask, User.builder().isManager(true).build());
+        List<String> errors = taskService.updateTask(updatedTask, User.builder().isManager(true).build());
 
         assertTrue(errors.isEmpty(), "Should not have any errors");
         verify(taskRepository, times(1)).updateTask(updatedTask);
-
         assertEquals("Updated Task Title", updatedTask.getTitle(), "Title should be updated");
         assertEquals(LocalDate.now().plusDays(3), updatedTask.getStartDate(), "Start date should be updated");
         assertEquals(LocalDate.now().plusDays(8), updatedTask.getEndDate(), "End date should be updated");
     }
+
 
     @Test
     void deleteTask_should_return_errors_when_task_is_null(){
@@ -242,6 +257,22 @@ public class TaskServiceTests {
         assertEquals("this task is locked can't be deleted or updated", errors.get(0), "Error message should match");
     }
 
+    @Test
+    void deleteTask_should_return_errors_when_user_not_manager_and_task_not_created_by_user() {
+        Task task = Task.builder()
+                .id(1L)
+                .assignedTo(User.builder().id(2L).build())
+                .createdBy(User.builder().id(3L).build())
+                .isLocked(false)
+                .build();
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(task));
+
+        List<String> errors = taskService.deleteTask(1L, User.builder().id(1L).isManager(false).build());
+
+        assertEquals(1, errors.size(), "Should have 1 error");
+        assertEquals("You do not have permission to delete this task.", errors.get(0), "Error message should match");
+    }
 
     @Test
     void deleteTask_should_delete_task_when_manager_deletes() {
@@ -351,6 +382,107 @@ public class TaskServiceTests {
         verify(userService, times(1)).update(user); // Ensure user is updated
     }
 
+    @Test
+    void findAllTodoTasks_should_return_todo_tasks() {
+        Task todoTask = Task.builder().status(Task_Status.TODO).build();
+        Task inProgressTask = Task.builder().status(Task_Status.IN_PROGRESS).build();
+        Task doneTask = Task.builder().status(Task_Status.DONE).build();
 
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(todoTask, inProgressTask, doneTask));
+
+        List<Task> todoTasks = taskService.findAllTodoTasks();
+
+        assertEquals(1, todoTasks.size(), "Should return 1 TODO task");
+        assertEquals(Task_Status.TODO, todoTasks.get(0).getStatus(), "Task status should be TODO");
+    }
+
+    @Test
+    void findAllInProgressTasks_should_return_in_progress_tasks() {
+        Task todoTask = Task.builder().status(Task_Status.TODO).build();
+        Task inProgressTask = Task.builder().status(Task_Status.IN_PROGRESS).build();
+        Task doneTask = Task.builder().status(Task_Status.DONE).build();
+
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(todoTask, inProgressTask, doneTask));
+
+        List<Task> inProgressTasks = taskService.findAllInProgressTasks();
+
+        assertEquals(1, inProgressTasks.size(), "Should return 1 IN_PROGRESS task");
+        assertEquals(Task_Status.IN_PROGRESS, inProgressTasks.get(0).getStatus(), "Task status should be IN_PROGRESS");
+    }
+
+    @Test
+    void findAllDoneTasks_should_return_done_tasks() {
+        Task todoTask = Task.builder().status(Task_Status.TODO).build();
+        Task inProgressTask = Task.builder().status(Task_Status.IN_PROGRESS).build();
+        Task doneTask = Task.builder().status(Task_Status.DONE).build();
+
+        when(taskRepository.findAll()).thenReturn(Arrays.asList(todoTask, inProgressTask, doneTask));
+
+        List<Task> doneTasks = taskService.findAllDoneTasks();
+
+        assertEquals(1, doneTasks.size(), "Should return 1 DONE task");
+        assertEquals(Task_Status.DONE, doneTasks.get(0).getStatus(), "Task status should be DONE");
+    }
+
+    @Test
+    void requestModification_should_return_error_when_task_not_found() {
+        Long taskId = 1L;
+        User loggedInUser = User.builder().isManager(false).build();
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        List<String> errors = taskService.requestModification(taskId, loggedInUser);
+
+        // Assert
+        assertEquals(1, errors.size(), "Should return one error");
+        assertEquals("Task not found.", errors.get(0), "Error message should indicate task not found");
+    }
+
+    @Test
+    void requestModification_should_return_error_when_task_is_locked() {
+        Long taskId = 1L;
+        User loggedInUser = User.builder().isManager(true).build();
+
+        Task lockedTask = Task.builder().id(taskId).isLocked(true).isModificationRequested(false).build();
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(lockedTask));
+
+        List<String> errors = taskService.requestModification(taskId, loggedInUser);
+
+        assertEquals(1, errors.size(), "Should return one error");
+        assertEquals("Modification request already exists or task is locked.", errors.get(0),
+                "Error message should indicate task is locked");
+    }
+
+    @Test
+    void requestModification_should_return_error_when_modification_requested_already() {
+        Long taskId = 1L;
+        User loggedInUser = User.builder().isManager(true).build();
+
+        Task modificationRequestedTask = Task.builder().id(taskId).isLocked(false).isModificationRequested(true).build();
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(modificationRequestedTask));
+
+        List<String> errors = taskService.requestModification(taskId, loggedInUser);
+
+        assertEquals(1, errors.size(), "Should return one error");
+        assertEquals("Modification request already exists or task is locked.", errors.get(0),
+                "Error message should indicate modification request already exists");
+    }
+
+    @Test
+    void requestModification_should_process_modification_request_when_user_is_manager() {
+        Long taskId = 1L;
+        User loggedInUser = User.builder().isManager(true).build(); // Is a manager
+
+        Task task = Task.builder().id(taskId).isLocked(false).isModificationRequested(false).assignedTo(User.builder().updateToken(1).build()).build();
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+
+        List<String> errors = taskService.requestModification(taskId, loggedInUser);
+
+        assertEquals(0, errors.size(), "Should not return any errors");
+        assertTrue(task.isModificationRequested(), "Task should have modification requested set to true");
+        verify(taskRepository, times(1)).updateTask(task); // Verify updateTask was called
+        assertEquals(0, task.getAssignedTo().getUpdateToken(), "Assigned user update token should be reset to 0");
+        verify(userService, times(1)).update(task.getAssignedTo()); // Verify user update was called
+    }
 
 }

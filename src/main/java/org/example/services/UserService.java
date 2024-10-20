@@ -13,10 +13,6 @@ public class UserService {
     @Inject
     private UserRepository userRepository;
 
-//    public UserService() {
-//        userRepository = new UserRepositoryImpl();
-//    }
-
     public List<User> findAll() {
         return userRepository.findAll();
     }
