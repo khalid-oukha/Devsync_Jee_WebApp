@@ -18,6 +18,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 public class UserServiceTests {
 
     @Mock
@@ -91,7 +92,112 @@ public class UserServiceTests {
         Optional<User> result = userService.findById(1L);
 
         assertTrue(result.isPresent(),"user should be present");
-        assertEquals(expactedUser,result.get(),"returned user should match the expacted user");
-
+        assertEquals(expactedUser,result.get(),"returned user should match the exacted user");
     }
+
+    @Test
+    void create_should_create_a_user() {
+        User user = User.builder()
+                .id(1000L)
+                .username("alami")
+                .firstName("Ahmed")
+                .lastName("Hasan")
+                .email("alami@gmail.com")
+                .password("password123")
+                .build();
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.empty());
+        Optional<User> beforeUser = userService.findById(1000L);
+        assertFalse(beforeUser.isPresent(), "User should not exist before creation");
+
+        doNothing().when(userRepository).create(user);
+
+        userService.create(user);
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.of(user));
+        Optional<User> afterUser = userService.findById(1000L);
+
+        verify(userRepository, times(1)).create(user);
+
+        assertTrue(afterUser.isPresent(), "User should exist after creation");
+        assertEquals(user.getId(), afterUser.get().getId(), "User ID should match after creation");
+    }
+
+    @Test
+    void create_and_delete_should_work_properly() {
+        User user = User.builder()
+                .id(1000L)
+                .username("alami")
+                .firstName("Ahmed")
+                .lastName("Hasan")
+                .email("alami@gmail.com")
+                .password("password123")
+                .build();
+
+        doNothing().when(userRepository).create(user);
+        userService.create(user);
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.of(user));
+
+        Optional<User> createdUser = userService.findById(1000L);
+        assertTrue(createdUser.isPresent(), "User should exist after creation");
+        assertEquals(user.getId(), createdUser.get().getId(), "Created user ID should match");
+
+        doNothing().when(userRepository).delete(1000L);
+        userService.delete(1000L);
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.empty());
+
+        Optional<User> afterDelete = userService.findById(1000L);
+        assertFalse(afterDelete.isPresent(), "User should no longer exist after deletion");
+
+        verify(userRepository, times(1)).create(user);
+        verify(userRepository, times(1)).delete(1000L);
+    }
+
+        @Test
+        void delete_should_throw_exception_when_user_not_found() {
+        when(userRepository.findById(1000L)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> userService.delete(1000L), "Should throw exception when user not found");
+
+        verify(userRepository, never()).delete(1000L);
+         }
+
+    @Test
+    void update_should_update_existing_user() {
+        User existingUser = User.builder()
+                .id(1000L)
+                .username("alami")
+                .firstName("Ahmed")
+                .lastName("Hasan")
+                .email("alami@gmail.com")
+                .password("password123")
+                .build();
+
+        User updatedUser = User.builder()
+                .id(1000L)
+                .username("alamiUpdated")
+                .firstName("Ahmed")
+                .lastName("Hasan")
+                .email("alamiUpdated@gmail.com")
+                .password("newpassword")
+                .build();
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.of(existingUser));
+
+        doNothing().when(userRepository).update(updatedUser);
+
+        userService.update(updatedUser);
+
+        verify(userRepository, times(1)).update(updatedUser);
+
+        when(userRepository.findById(1000L)).thenReturn(Optional.of(updatedUser));
+
+        Optional<User> afterUpdateUser = userService.findById(1000L);
+        assertTrue(afterUpdateUser.isPresent(), "User should exist after update");
+        assertEquals(updatedUser.getUsername(), afterUpdateUser.get().getUsername(), "Updated username should match");
+        assertEquals(updatedUser.getEmail(), afterUpdateUser.get().getEmail(), "Updated email should match");
+    }
+
 }

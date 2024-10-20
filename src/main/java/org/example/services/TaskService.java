@@ -24,6 +24,7 @@ public class TaskService {
     @Inject
     private UserService userService;
 
+
     public List<String> createTask(Task task, String assignedToId) {
         List<String> errors = taskValidator.validateTask(task);
 
@@ -52,14 +53,16 @@ public class TaskService {
     }
 
     public List<String> updateTask(Task task, User loggedInUser) {
-        List<String> errors = taskValidator.validateTask(task);
+        List<String> errors = new ArrayList<>();
         if (task == null) {
             errors.add("Task not found.");
             return errors;
         }
 
+//        errors.addAll(taskValidator.validateTask(task));
+
         if (task.isLocked()) {
-            errors.add("this task is locked can't be deleted or updated");
+            errors.add("This task is locked; it can't be deleted or updated.");
             return errors;
         }
 
@@ -73,6 +76,7 @@ public class TaskService {
         }
         return errors;
     }
+
 
     public Task findById(Long taskId) {
         return taskRepository.findById(taskId).orElse(null);

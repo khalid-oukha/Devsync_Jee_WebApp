@@ -1,9 +1,13 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.util.Set;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "tags")
 public class Tag {
@@ -19,6 +23,7 @@ public class Tag {
 
     public Tag() {
     }
+
 
     public Tag(String name) {
         this.name = name;

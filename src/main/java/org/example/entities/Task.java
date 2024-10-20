@@ -1,6 +1,8 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import org.example.entities.enums.Task_Status;
 
 import java.time.LocalDate;
@@ -9,6 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
+@Builder
+@AllArgsConstructor
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

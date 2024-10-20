@@ -1,5 +1,7 @@
 package org.example.services;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.example.entities.Tag;
 import org.example.repository.tag.TagRepository;
 import org.example.repository.tag.TagRepositoryImpl;
@@ -7,13 +9,12 @@ import org.example.repository.tag.TagRepositoryImpl;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class TagService {
 
-    private final TagRepository tagRepository;
+    @Inject
+    private TagRepository tagRepository;
 
-    public TagService() {
-        this.tagRepository = new TagRepositoryImpl();
-    }
 
     public List<Tag> findAll() {
         return tagRepository.findAll();
@@ -35,15 +36,5 @@ public class TagService {
         return tagRepository.findById(tagId).orElse(null);
     }
 
-    public Tag findOrCreateTag(String tagName) {
-        Optional<Tag> existingTag = tagRepository.findByName(tagName);
-        if (existingTag.isPresent()) {
-            return existingTag.get();
-        } else {
-            Tag newTag = new Tag(tagName);
-            tagRepository.create(newTag);
-            return newTag;
-        }
-    }
 
 }
